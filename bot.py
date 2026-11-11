@@ -1,18 +1,17 @@
 import os
 import requests
+from huggingface_hub import InferenceClient
 
 HF_API_KEY = os.environ.get("HF_API_KEY")
 TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN")
 TELEGRAM_CHAT_ID = "@ParleyVIPIA"
 
 def generar_parley():
-    # Usamos un modelo estándar garantizado para el router gratuito de Hugging Face
-    url = "https://router.huggingface.co/hf-inference/models/mistralai/Mistral-7B-Instruct-v0.3"
-    
-    headers = {
-        "Authorization": f"Bearer {HF_API_KEY}",
-        "Content-Type": "application/json"
-    }
+    # Usamos el cliente oficial de Hugging Face con un modelo conversacional libre
+    client = InferenceClient(
+        model="mistralai/Mistral-7B-Instruct-v0.3",
+        token=HF_API_KEY
+    )
     
     prompt = (
         "Actúa como un tipster experto en apuestas de fútbol de categoría prémium. "
@@ -24,20 +23,14 @@ def generar_parley():
         "4. Presenta el mensaje listo para publicar en un canal de Telegram, con un diseño profesional, emojis llamativos, cuotas estimadas por partido y la cuota total combinada."
     )
     
-    payload = {
-        "inputs": prompt,
-        "parameters": {"max_new_tokens": 800, "temperature": 0.7}
-    }
+    # Realizamos la llamada mediante el cliente oficial
+    response = client.chat_completion(
+        messages=[{"role": "user", "content": prompt}],
+        max_tokens=800,
+        temperature=0.7,
+    )
     
-    response = requests.post(url, headers=headers, json=payload)
-    
-    if response.status_code == 200:
-        data = response.json()
-        if isinstance(data, list) and len(data) > 0:
-            return data[0].get('generated_text', str(data))
-        return str(data)
-    else:
-        raise Exception(f"Error en la API de Hugging Face: {response.text}")
+    return response.choices[0].message.content
 
 def enviar_a_telegram(mensaje):
     url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
@@ -53,7 +46,7 @@ def enviar_a_telegram(mensaje):
         print(f"Error al enviar a Telegram: {response.text}")
 
 if __name__ == "__main__":
-    print("Generando parley con Hugging Face...")
+    print("Generando parley con Hugging Face (Cliente Oficial)...")
     texto_parley = generar_parley()
     print("Enviando a Telegram...")
     enviar_a_telegram(texto_parley)
