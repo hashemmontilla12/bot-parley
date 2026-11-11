@@ -1,15 +1,12 @@
 import os
 import requests
 from google import genai
-from google.genai import types
 
-# 1. Configurar credenciales desde los secretos de GitHub Actions
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN")
 TELEGRAM_CHAT_ID = "@ParleyVIPIA"
 
 def generar_parley():
-    # Inicializar el cliente oficial de Gemini
     client = genai.Client(api_key=GEMINI_API_KEY)
     
     prompt = (
@@ -22,10 +19,10 @@ def generar_parley():
         "4. Presenta el mensaje listo para publicar en un canal de Telegram, con un diseño profesional, emojis llamativos, cuotas estimadas por partido y la cuota total combinada."
     )
     
-    # Llamada al modelo utilizando gemini-2.5-flash
+    # Llamada directa utilizando el modelo estándar de la nueva SDK
     response = client.models.generate_content(
-        model='gemini-1.5-flash',
-        contents=prompt
+        model='gemini-2.5-flash',
+        contents=prompt,
     )
     
     return response.text
