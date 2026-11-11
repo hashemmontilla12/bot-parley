@@ -6,8 +6,8 @@ TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN")
 TELEGRAM_CHAT_ID = "@ParleyVIPIA"
 
 def generar_parley():
-    # Usamos la API de inferencia gratuita y abierta de Hugging Face
-    url = "https://api-inference.huggingface.co/models/meta-llama/Llama-3.3-70B-Instruct"
+    # Usamos la nueva URL oficial del router de inferencia de Hugging Face
+    url = "https://router.huggingface.co/hf-inference/models/meta-llama/Llama-3.3-70B-Instruct"
     
     headers = {
         "Authorization": f"Bearer {HF_API_KEY}",
@@ -33,7 +33,6 @@ def generar_parley():
     
     if response.status_code == 200:
         data = response.json()
-        # Hugging Face suele devolver una lista o un diccionario con el texto generado
         if isinstance(data, list) and len(data) > 0:
             return data[0].get('generated_text', str(data))
         return str(data)
