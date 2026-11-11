@@ -1,16 +1,17 @@
 import os
 import requests
 
-GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
+# Credenciales desde los secretos de GitHub Actions
+GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
 TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN")
 TELEGRAM_CHAT_ID = "@ParleyVIPIA"
 
 def generar_parley():
-    # Usamos la ruta compatible con OpenAI que provee Google AI Studio
-    url = "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"
+    # Usamos la API oficial y ultra rápida de Groq con Llama 3
+    url = "https://api.groq.com/openai/v1/chat/completions"
     
     headers = {
-        "Authorization": f"Bearer {GEMINI_API_KEY}",
+        "Authorization": f"Bearer {GROQ_API_KEY}",
         "Content-Type": "application/json"
     }
     
@@ -25,10 +26,11 @@ def generar_parley():
     )
     
     payload = {
-        "model": "google/gemini-2.0-flash-lite", # Modelo estándar compatible con el proxy OpenAI de Google
+        "model": "llama-3.3-70b-versatile", # Modelo potente, estable y gratuito en Groq
         "messages": [
             {"role": "user", "content": prompt}
-        ]
+        ],
+        "temperature": 0.7
     }
     
     response = requests.post(url, headers=headers, json=payload)
@@ -37,7 +39,7 @@ def generar_parley():
         data = response.json()
         return data['choices'][0]['message']['content']
     else:
-        raise Exception(f"Error en la API: {response.text}")
+        raise Exception(f"Error en la API de Groq: {response.text}")
 
 def enviar_a_telegram(mensaje):
     url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
@@ -53,7 +55,7 @@ def enviar_a_telegram(mensaje):
         print(f"Error al enviar a Telegram: {response.text}")
 
 if __name__ == "__main__":
-    print("Generando parley con Gemini...")
+    print("Generando parley con Groq...")
     texto_parley = generar_parley()
     print("Enviando a Telegram...")
     enviar_a_telegram(texto_parley)
