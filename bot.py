@@ -6,8 +6,8 @@ TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN")
 TELEGRAM_CHAT_ID = "@ParleyVIPIA"
 
 def generar_parley():
-    # Usamos la nueva URL oficial del router de inferencia de Hugging Face
-    url = "https://router.huggingface.co/hf-inference/models/meta-llama/Llama-3.3-70B-Instruct"
+    # Usamos un modelo estándar garantizado para el router gratuito de Hugging Face
+    url = "https://router.huggingface.co/hf-inference/models/mistralai/Mistral-7B-Instruct-v0.3"
     
     headers = {
         "Authorization": f"Bearer {HF_API_KEY}",
