@@ -1,50 +1,27 @@
-import os
-import requests
-from google import genai
-from google.genai import types
+name: Automatizar Parley Diario
 
-# 1. Configurar credenciales desde los secretos de GitHub Actions
-GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
-TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN")
-TELEGRAM_CHAT_ID = "@ParleyVIPIA"
+on:
+  schedule:
+    - cron: '0 12 * * *'
+  workflow_dispatch: 
 
-def generar_parley():
-    # Inicializar el cliente oficial de Gemini
-    client = genai.Client(api_key=GEMINI_API_KEY)
-    
-    prompt = (
-        "Actúa como un tipster experto en apuestas de fútbol de categoría prémium. "
-        "Genera un pronóstico combinado tipo Bet Builder de exactamente 5 partidos de fútbol para hoy. "
-        "Reglas estrictas:\n"
-        "1. Cuotas altas y atractivas en cada selección.\n"
-        "2. PROHIBIDO incluir mercados de 'Ambos marcan: No' o variantes similares.\n"
-        "3. Usa mercados de ganadores, más de 2.5 goles, tiros de esquina o combinaciones lógicas de Bet Builder.\n"
-        "4. Presenta el mensaje listo para publicar en un canal de Telegram, con un diseño profesional, emojis llamativos, cuotas estimadas por partido y la cuota total combinada."
-    )
-    
-    # Llamada al modelo utilizando gemini-2.5-flash
-    response = client.models.generate_content(
-        model='gemini-2.5-flash',
-        contents=prompt
-    )
-    
-    return response.text
+jobs:
+  run-bot:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clonar repositorio
+        uses: actions/checkout@v4
 
-def enviar_a_telegram(mensaje):
-    url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
-    payload = {
-        "chat_id": TELEGRAM_CHAT_ID,
-        "text": mensaje,
-        "parse_mode": "Markdown"
-    }
-    response = requests.post(url, json=payload)
-    if response.status_code == 200:
-        print("¡Parley enviado con éxito a Telegram!")
-    else:
-        print(f"Error al enviar a Telegram: {response.text}")
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
 
-if __name__ == "__main__":
-    print("Generando parley con Gemini...")
-    texto_parley = generar_parley()
-    print("Enviando a Telegram...")
-    enviar_a_telegram(texto_parley)
+      - name: Instalar dependencias
+        run: pip install google-genai requests
+
+      - name: Ejecutar bot
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        run: python bot.py
