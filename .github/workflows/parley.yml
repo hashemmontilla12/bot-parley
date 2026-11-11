@@ -22,6 +22,6 @@ jobs:
 
       - name: Ejecutar bot
         env:
-          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          HF_API_KEY: ${{ secrets.HF_API_KEY }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
         run: python bot.py
