@@ -7,8 +7,8 @@ TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN")
 TELEGRAM_CHAT_ID = "@ParleyVIPIA"
 
 def generar_parley():
-    # URL directa de la API oficial de Gemini (modelo flash rápido y moderno)
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.0-flash:generateContent?key={GEMINI_API_KEY}"
+    # URL con el modelo estándar universal compatible con v1beta
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={GEMINI_API_KEY}"
     
     prompt = (
         "Actúa como un tipster experto en apuestas de fútbol de categoría prémium. "
@@ -29,7 +29,6 @@ def generar_parley():
     response = requests.post(url, json=payload)
     if response.status_code == 200:
         data = response.json()
-        # Extraer el texto de la respuesta de forma segura
         texto = data['candidates'][0]['content']['parts'][0]['text']
         return texto
     else:
