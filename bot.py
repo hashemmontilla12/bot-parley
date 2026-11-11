@@ -1,13 +1,14 @@
 import os
 import requests
-from google import genai
 
+# 1. Configurar credenciales desde los secretos de GitHub Actions
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN")
 TELEGRAM_CHAT_ID = "@ParleyVIPIA"
 
 def generar_parley():
-    client = genai.Client(api_key=GEMINI_API_KEY)
+    # URL directa de la API oficial de Gemini (modelo flash rápido y moderno)
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={GEMINI_API_KEY}"
     
     prompt = (
         "Actúa como un tipster experto en apuestas de fútbol de categoría prémium. "
@@ -19,13 +20,20 @@ def generar_parley():
         "4. Presenta el mensaje listo para publicar en un canal de Telegram, con un diseño profesional, emojis llamativos, cuotas estimadas por partido y la cuota total combinada."
     )
     
-    # Llamada directa utilizando el modelo estándar de la nueva SDK
-    response = client.models.generate_content(
-        model='gemini-2.5-flash',
-        contents=prompt,
-    )
+    payload = {
+        "contents": [{
+            "parts": [{"text": prompt}]
+        }]
+    }
     
-    return response.text
+    response = requests.post(url, json=payload)
+    if response.status_code == 200:
+        data = response.json()
+        # Extraer el texto de la respuesta de forma segura
+        texto = data['candidates'][0]['content']['parts'][0]['text']
+        return texto
+    else:
+        raise Exception(f"Error de Gemini API: {response.text}")
 
 def enviar_a_telegram(mensaje):
     url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
