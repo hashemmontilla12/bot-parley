@@ -8,7 +8,7 @@ TELEGRAM_CHAT_ID = "@ParleyVIPIA"
 
 def generar_parley():
     # URL directa de la API oficial de Gemini (modelo flash rápido y moderno)
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={GEMINI_API_KEY}"
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.0-flash:generateContent?key={GEMINI_API_KEY}"
     
     prompt = (
         "Actúa como un tipster experto en apuestas de fútbol de categoría prémium. "
